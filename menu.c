@@ -20,8 +20,8 @@ void showScreen(){
    Glcd_Write_Text("1 Measure temperature", 0, 1, 2);   // show lights
    Glcd_Write_Text("2 T-statistics", 0, 2, 2);          // show graphic
    Glcd_Write_Text("3 Measure pressure", 0, 3, 2);     // preassure
-   Glcd_Write_Text("4 P-statistics", 0, 4, 2);
-   Glcd_Write_Text("5 Check warning", 0, 5, 2);
+   Glcd_Write_Text("4 P-statistics", 0, 4, 2);          //   isto od t, samo copy, so random vrednosti.
+   Glcd_Write_Text("5 Check warning", 0, 5, 2);         // ako e visoka alarms
    Glcd_Write_Text("6 Home", 0, 6, 2);
    Glcd_Write_Text("====================", 5, 7, 2);
 }
@@ -35,5 +35,8 @@ void main() {
   Glcd_Init();                                   // Initialize GLCD
   Glcd_Fill(0x00);
 
-  showScreen();
+  showScreen();  // FIRST: show menu
+  
+  // key init
+  // case.. i vnatre funkcii
 }
