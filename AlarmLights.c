@@ -22,9 +22,9 @@ void checkLimits() {
           i=0;
           while(i<30) {
                PORTA=0b00010000;
-               Delay_ms(2);
+               Delay_ms(100);
                PORTA=0b00000000;
-               Delay_ms(2);
+               Delay_ms(100);
                i=i+1;
           }
      }
@@ -32,9 +32,9 @@ void checkLimits() {
           i=0;
           while(i<30) {
                PORTA=0b00001000;
-               Delay_ms(5);
+               Delay_ms(100);
                PORTA=0b00000000;
-               Delay_ms(5);
+               Delay_ms(100);
                i=i+1;
           }
      }
