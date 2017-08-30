@@ -1,3 +1,7 @@
+// Keypad module connections
+char  keypadPort at PORTC;
+// End Keypad module connections
+
 // Glcd module connections
 char GLCD_DataPort at PORTD;
 sbit GLCD_CS1 at RB0_bit;
