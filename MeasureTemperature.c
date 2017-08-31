@@ -20,7 +20,7 @@ sbit GLCD_RST at RB5_bit;
 //  18B20: 12
 const unsigned short TEMP_RESOLUTION = 9;
 
-char *text = "000.0000";
+char *text = "000.00";
 unsigned temp;
 
 void Display_Temperature(unsigned int temp2write) {
@@ -52,12 +52,10 @@ void Display_Temperature(unsigned int temp2write) {
   temp_fraction *= 625;
 
   // Convert temp_fraction to characters
-  text[4] =  temp_fraction/1000    + 48;         // Extract thousands digit
-  text[5] = (temp_fraction/100)%10 + 48;         // Extract hundreds digit
-  text[6] = (temp_fraction/10)%10  + 48;         // Extract tens digit
-  text[7] =  temp_fraction%10      + 48;         // Extract ones digit
+  text[4] =  temp_fraction/1000    + 48;         // Extract tens digit
+  text[5] = (temp_fraction/100)%10 + 48;         // Extract ones digit
 
-  // Print temperature on LCD
+  // Print temperature
   Glcd_Write_Text(text, 1, 5, 2);
 }
 
@@ -70,13 +68,11 @@ void main() {
   Glcd_Init();
   Glcd_Fill(0x00);
 
-  //--- Main loop
-  do {
     //--- Perform temperature reading
     Ow_Reset(&PORTE, 2);                         // Onewire reset signal
     Ow_Write(&PORTE, 2, 0xCC);                   // Issue command SKIP_ROM
     Ow_Write(&PORTE, 2, 0x44);                   // Issue command CONVERT_T
-    Delay_us(120);
+    Delay_ms(2000);
 
     Ow_Reset(&PORTE, 2);
     Ow_Write(&PORTE, 2, 0xCC);                   // Issue command SKIP_ROM
@@ -87,7 +83,4 @@ void main() {
 
     //--- Format and display result on Lcd
     Display_Temperature(temp);
-
-    Delay_ms(500);
-  } while (1);
 }
