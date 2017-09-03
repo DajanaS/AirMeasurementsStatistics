@@ -79,17 +79,17 @@ void measureTemperature() {
      
      counter = 0;
      do {    //--- perform temperature reading
-        Ow_Reset(&PORTA, 5);                         // Onewire reset signal
-        Ow_Write(&PORTA, 5, 0xCC);                   // Issue command SKIP_ROM
-        Ow_Write(&PORTA, 5, 0x44);                   // Issue command CONVERT_T
+        Ow_Reset(&PORTE, 2);                         // Onewire reset signal
+        Ow_Write(&PORTE, 2, 0xCC);                   // Issue command SKIP_ROM
+        Ow_Write(&PORTE, 2, 0x44);                   // Issue command CONVERT_T
         Delay_us(120);
 
-        Ow_Reset(&PORTA, 5);
-        Ow_Write(&PORTA, 5, 0xCC);                   // Issue command SKIP_ROM
-        Ow_Write(&PORTA, 5, 0xBE);                   // Issue command READ_SCRATCHPAD
+        Ow_Reset(&PORTE, 2);
+        Ow_Write(&PORTE, 2, 0xCC);                   // Issue command SKIP_ROM
+        Ow_Write(&PORTE, 2, 0xBE);                   // Issue command READ_SCRATCHPAD
 
-        temp =  Ow_Read(&PORTA, 5);
-        temp = (Ow_Read(&PORTA, 5) << 8) + temp;
+        temp =  Ow_Read(&PORTE, 2);
+        temp = (Ow_Read(&PORTE, 2) << 8) + temp;
 
         //--- Format and display result on Lcd
         Display_Temperature(temp);
@@ -147,7 +147,7 @@ void main() {
         switch (kp) {
                case 1: showHomeScreen();
                     break; // 1
-               case 2: measureTemperature(); // CLICK RA1
+               case 2: measureTemperature();
                     break; // 2
                case 3:showTemperatureStatistics();
                     break; // 3
