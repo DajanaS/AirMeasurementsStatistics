@@ -147,7 +147,7 @@ void main() {
         switch (kp) {
                case 1: showHomeScreen();
                     break; // 1
-               case 2: measureTemperature();
+               case 2: measureTemperature(); // CLICK RA1
                     break; // 2
                case 3:showTemperatureStatistics();
                     break; // 3
