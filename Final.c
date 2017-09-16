@@ -1,5 +1,8 @@
+int counter;
 unsigned short kp;
-int temperature, tempMin, tempMax;
+int tempMin, tempMax, i;
+unsigned temp;
+int tf;
 
 // Keypad module connections
 char  keypadPort at PORTA;
@@ -21,6 +24,52 @@ sbit GLCD_RST_Direction at TRISB5_bit;
 sbit GLCD_RST at RB5_bit;
 // End Glcd module connections
 
+const unsigned short TEMP_RESOLUTION = 9;
+
+char *text = "000.00";
+char *txt;
+const int c48 = 48;
+const int c10 = 10;
+const int c100 = 100;
+
+void Display_Temperature(unsigned int temp2write) {
+  const unsigned short RES_SHIFT = TEMP_RESOLUTION - 8;
+  char temp_whole;
+  unsigned int temp_fraction;
+
+  // check if temperature is negative
+  if (temp2write & 0x8000) {
+    text[0] = '-';
+    temp2write = ~temp2write + 1;
+  }
+
+  // extract temp_whole
+  temp_whole = temp2write >> RES_SHIFT;
+
+  // convert temp_whole to characters
+  if (temp_whole/c100)
+     text[0] = temp_whole/c100  + c48;
+  else
+     text[0] = ' ';
+
+  text[1] = (temp_whole/c10)%c10 + c48;         // Extract tens digit
+  tf = (temp_whole/c10)%c10;
+  text[2] =  temp_whole%c10 + c48;             // Extract ones digit
+  tf = tf*c10 + temp_whole%c10;
+
+  // extract temp_fraction and convert it to unsigned int
+  temp_fraction  = temp2write << (4-RES_SHIFT);
+  temp_fraction &= 0x000F;
+  temp_fraction *= 625;
+
+  // convert temp_fraction to characters
+  text[4] =  temp_fraction/(c100*c10) + c48;
+  text[5] = (temp_fraction/c100)%c10 + c48;
+
+  // print temperature on LCD
+  Glcd_Write_Text(text,38,4,2);
+}
+
 void showHomeScreen() {
      Glcd_Fill(0x00);
      Glcd_Write_Text("======= MENU =======", 5, 0, 2);
@@ -33,39 +82,89 @@ void showHomeScreen() {
 
 void measureTemperature() {
      Glcd_Fill(0x00);
-     temperature = 31;
-     Glcd_Write_Text("Measured", 0, 1, 2);
-     Glcd_Write_Text("Temperature:", 0, 2, 2);
-     //Glcd_Write_Text(temperature,0,4,2);
-     Glcd_Write_Text("Normal: 3 or 4", 0, 6, 2);
+     Glcd_Write_Text("Measured temperature:", 0, 1, 2);
+
+     counter = 0;
+     do {    //--- perform temperature reading
+        Ow_Reset(&PORTE, 2);                         // Onewire reset signal
+        Ow_Write(&PORTE, 2, 0xCC);                   // Issue command SKIP_ROM
+        Ow_Write(&PORTE, 2, 0x44);                   // Issue command CONVERT_T
+        Delay_us(120);
+
+        Ow_Reset(&PORTE, 2);
+        Ow_Write(&PORTE, 2, 0xCC);                   // Issue command SKIP_ROM
+        Ow_Write(&PORTE, 2, 0xBE);                   // Issue command READ_SCRATCHPAD
+
+        temp =  Ow_Read(&PORTE, 2);
+        temp = (Ow_Read(&PORTE, 2) << 8) + temp;
+        Delay_ms(500);
+        counter++;
+     } while (counter<3);
+     
+     //--- Format and display result on Lcd
+     Display_Temperature(temp);
+
      TRISC = 0x00;
      PORTC = 0x00;
-     if(temperature >= -55)
+     if(tf >= -55)
      PORTC.B7 = 1;
-     if(temperature >= -32.5)
+     if(tf >= -32.5)
      PORTC.B6 = 1;
-     if(temperature >= -10)
+     if(tf >= -10)
      PORTC.B5 = 1;
-     if(temperature >= 12.5)
+     if(tf >= 12.5)
      PORTC.B4 = 1;
-     if(temperature >= 35)
+     if(tf >= 35)
      PORTC.B3 = 1;
-     if(temperature >= 57.5)
+     if(tf >= 57.5)
      PORTC.B2 = 1;
-     if(temperature >= 80)
+     if(tf >= 80)
      PORTC.B1 = 1;
-     if(temperature >= 102.5)
+     if(tf >= 102.5)
      PORTC.B0 = 1;
 }
 
 void showTemperatureStatistics() {
      Glcd_Fill(0x00);
-     Glcd_Write_Text("Show T-Statistics", 0, 1, 2);
 }
 
 void checkWarning() {
      Glcd_Fill(0x00);
-     Glcd_Write_Text("Check Warning", 0, 1, 2);
+     Glcd_Write_Text("Warning", 38, 1, 2);
+
+     TRISC = 0x00;
+    PORTC = 0x00;
+    if (tf > tempMax) {
+        //Glcd_Write_Text("WARNING!!!", 5, 3, 2);
+        Glcd_Write_Text("HIGH", 50, 4, 2);
+        //Glcd_Write_Text("WARNING!!!", 5, 5, 2);
+        i = 0;
+        while (i < 30) {
+            PORTC = 0b11111111;
+            Delay_ms(100);
+            PORTC = 0b00000000;
+            Delay_ms(100);
+            i = i + 1;
+        }
+    }
+    else if (tf < tempMin) {
+        //Glcd_Write_Text("WARNING!!!", 5, 3, 2);
+        Glcd_Write_Text("LOW", 50, 4, 2);
+        //Glcd_Write_Text("WARNING!!!", 5, 5, 2);
+        i = 0;
+        while (i < 30) {
+            PORTC = 0b11111111;
+            Delay_ms(150);
+            PORTC = 0b00000000;
+            Delay_ms(150);
+            i = i + 1;
+        }
+    }
+    else {
+         Glcd_Write_Text("OK", 50, 4, 2);
+    }
+    PORTC = 0x00;
+
 }
 
 void main() {
@@ -75,9 +174,9 @@ void main() {
      C2ON_bit = 0;
      Glcd_Init(); // Initialize GLCD
      Glcd_Fill(0x00);
-     temperature = 0;
      tempMin = -10;
      tempMax = 30;
+     tf = 0;
      showHomeScreen(); // FIRST: show menu
      do {
         kp = 0; // Reset key code variable
@@ -89,7 +188,7 @@ void main() {
                     break; // 1
                case 2: measureTemperature();
                     break; // 2
-               case 3:showTemperatureStatistics();
+               case 3: showTemperatureStatistics();
                     break; // 3
                case 4: checkWarning();
                     break; // A
