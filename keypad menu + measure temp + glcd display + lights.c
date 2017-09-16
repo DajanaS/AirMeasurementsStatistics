@@ -27,11 +27,11 @@ sbit GLCD_RST at RB5_bit;
 const unsigned short TEMP_RESOLUTION = 9;
 
 char *text = "000.00";
-char *txt;
 const int c48 = 48;
 const int c10 = 10;
 const int c100 = 100;
-int temps[3] = {0};
+const int N = 4;
+int temps[N] = {0};
 
 void Display_Temperature(unsigned int temp2write) {
   const unsigned short RES_SHIFT = TEMP_RESOLUTION - 8;
@@ -106,9 +106,9 @@ void measureTemperature() {
      Display_Temperature(temp);
      
      // Shift left old values and add new in the beginning
-     for(i = 0; i < 3; i++)
+     for(i = 0; i < N; i++)
            temps[i] = temps[i+1];
-     temps[2] = tf;
+     temps[N-1] = tf;
     
      TRISC = 0x00;
      PORTC = 0x00;
@@ -132,15 +132,11 @@ void measureTemperature() {
 
 void showTemperatureStatistics() {
      Glcd_Fill(0x00);
-     for(i = 0; i < 3; i++){
-         IntToStr(temps[i],txt);
-         Glcd_Write_Text(txt,i,i,2);
+     j = 0;
+     for(i = 0; i < N; i++){
+         Glcd_Box(j+1,63-(temps[i]*0.35+19.25),j+27,63,2);
+         j+=29;
      }
-     
-     //Glcd_Line(0, 0, 0, 63, 2);
-     //Glcd_Line(1, 0, 1, 63, 2);
-     //Glcd_Line(2, 6, 2, 63, 2);
-     //Glcd_Line(3, 6, 3, 63, 2);
 }
 
 void checkWarning() { /*
