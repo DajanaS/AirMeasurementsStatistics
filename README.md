@@ -5,7 +5,7 @@
 ### Check out the final code [here](https://github.com/DajanaS/AirMeasurementsStatistics/blob/master/Final.c)
 ##
 ## 1. Description
-Our project Air Measurement Statistics is intended for the Microcontroller PIC16F887 (frequency 8 Mhz). Once it is turned on, the user sees the menu on the `Glcd` screen (Graphic LCD). By using KeyPad the 4 different options from the menu can be chosen. Each is explained in the following paragraph.
+Our project Air Measurement Statistics is intended for the Microcontroller PIC16F887 (frequency 8 Mhz). Once it is turned on, the user sees the menu on the `GLCD` screen (Graphic LCD). By using KeyPad the 4 different options from the menu can be chosen. Each is explained in the following paragraph.
 ## 2. Guide
 ### 2.1 KeyPad Menu & Home
 KeyPad menu is using the following buttons: RA0, RA1, RA2 and RA3. The first one brings the user home no matter on which screen they are currently. The other three bring the user to three different screens: *Measured temperature*, *Temperature statistics* and *Warnings*, respectively.
