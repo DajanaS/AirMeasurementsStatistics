@@ -3,6 +3,7 @@
 ### MPS Project by:
 [![](https://avatars1.githubusercontent.com/u/8987819?v=3&s=150)](https://github.com/DajanaS "Dajana Stojchevska") [![](https://avatars2.githubusercontent.com/u/18077884?v=4&s=150)](https://github.com/mtoshevska "Martina Toshevska") <br />
 ### Check out the final code [here](https://github.com/DajanaS/AirMeasurementsStatistics/blob/master/Final.c)
+##
 ## 1. Description
 Our project Air Measurement Statistics is intended for the Microcontroller PIC16F887 (frequency 8 Mhz). Once it is turned on, the user sees the menu on the `Glcd` screen (Graphic LCD). By using KeyPad the 4 different options from the menu can be chosen. Each is explained in the following paragraph.
 ## 2. Guide
